@@ -1,0 +1,158 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h2>Recherche d'identifiants </h2>
+
+    <p>A la recherche d'un identifiant</p>
+
+    {% if errors is not empty %}
+        <div class="error-box">
+            {% for fieldErrors in errors %}
+                {% for error in fieldErrors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- FORMULAIRE RECHERCHE SIMPLE -->
+    <form id="formIdent" data-validate="true" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="page" value="{{ page ?? 1 }}">
+        <input type="hidden" name="valide" value="{{ filters.valide ? 1 : 0 }}">
+
+        <div class="search-box">
+            <input type="text"
+                name="nom"
+                data-validate="optional|alpha"
+                placeholder="Nom de l'identifiant"
+                value="{{ filters.nom ?? '' }}">
+            <button type="submit">Rechercher</button>
+        </div>
+    </form>
+
+    <!-- Bouton Affiner -->
+    <div class="search-advanced">
+        <button type="button" id="btnAffiner">Affiner</button>
+    </div>
+
+    <!-- ZONE RESULTATS -->
+    <div class="results">
+        {% if results is not empty %}
+            {% for ident in results %}
+                <div class="card">
+                    <div class="card-left">
+                        <h3>{{ ident.nom ~ ' ' ~ ident.prenom }}</h3>
+                    </div>
+                    <div class="card-left">
+                        <p><u>Email</u>: {{ ident.email }}</p>
+                    </div>
+                    <div class="card-left">
+                        <p><u>Profil</u>: {{ ident.nom_role }}</p>
+                    </div>
+                    <div class="card-left">
+                        <p><u>Wishlist</u>: {{ ident.wishlist_nb }} / <u>Candidature</u>: {{ ident.postule_nb }}</p>
+                    </div>
+                    <div class="card-right">
+                        {% if ident.not_me == 0 %}
+
+                            {# ✏️ Edit #}
+                            {{ ident.buttons.edit|raw }}
+
+                            {# 🗑 Delete #}
+                            {{ ident.buttons.delete|raw }}
+
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <h3>Aucun résultat</h3>
+            </div>
+        {% endif %}
+
+        {% if totalPages is not empty and totalPages > 1 %}
+            <div class="pagination">
+                {% for p in pagination %}
+                    {% if p == '...' %}
+                        <span class="pagination-dots">...</span>
+                    {% else %}
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="page" value="{{ p }}">
+                            <input type="hidden" name="nom" value="{{ filters.nom ?? '' }}">
+                            <input type="hidden" name="prenom" value="{{ filters.prenom ?? '' }}">
+                            <input type="hidden" name="email" value="{{ filters.email ?? '' }}">
+                            <input type="hidden" name="valide" value="{{ filters.valide ? 1 : 0 }}">
+
+                            <button type="submit"
+                                    class="page-btn {% if p == page %}active{% endif %}">
+                                {{ p }}
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    <button class="btn-add"
+            onclick="window.location.href='{{ CDN ~ PREFIX ~ '/ident/create' }}'">
+        Ajouter
+    </button>
+
+    <!-- MODAL RECHERCHE AVANCEE -->
+    <div class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Recherche avancée</h3>
+
+            <form id="formIdent" data-validate="true" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="page" value="{{ page ?? 1 }}">
+
+                <label for="prenom">Prénom</label>
+                <input type="text"
+                    name="prenom"
+                    id="prenom"
+                    data-validate="optional|txt"
+                    value="{{ filters.prenom ?? '' }}">
+
+                <label for="email">Email</label>
+                <input type="email"
+                    name="email"
+                    id="email"
+                    autocomplete="on"
+                    data-validate="optional|email"
+                    value="{{ filters.email ?? '' }}">
+
+                <label>Profil
+                    <select name="id_role" data-validate="optional|integer">
+                        <option value="-1">-----</option>
+
+                        {% for role in roles %}
+                            <option value="{{ role.id_role }}"
+                                {% if filters.id_role is defined and filters.id_role == role.id_role %}
+                                    selected
+                                {% endif %}>
+                                {{ role.role }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>Active
+                    <input type="checkbox"
+                        name="valide"
+                        value="1"
+                        {% if filters.valide is not defined or filters.valide %}
+                            checked
+                        {% endif %}>
+                </label>
+
+                <button type="submit">Rechercher</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

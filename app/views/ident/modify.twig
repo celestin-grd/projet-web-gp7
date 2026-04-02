@@ -1,0 +1,168 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+
+    <h2>Modification d'identifiant </h2>
+
+    <script src="{{ CDN ~ PREFIX ~ '/js/modules/etudiant.js' }}"></script>
+    <script id="pilote-roles-data" type="application/json">
+        {{ PILOTE|json_encode|raw }}
+    </script>
+
+    {% if errors is not empty %}
+        <div class="error-box">
+            {% for fieldErrors in errors %}
+                {% for error in fieldErrors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <p>Dernière maj: {{ ident.valide_lastupdate ?? '' }}</p>
+
+    <form id="formIdent" data-validate="true" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="form_type" value="update_profile">
+
+        <label>Nom</label>
+        <input type="text" name="nom" value="{{ ident.nom }}" data-validate="required|alpha">
+
+        <label>Prénom</label>
+        <input type="text" name="prenom" value="{{ ident.prenom }}" data-validate="required|alpha">
+
+        <label>Email</label>
+        <input type="email" name="email" value="{{ ident.email }}" data-validate="required|email">
+
+        <label>Active</label>
+        <input type="checkbox"
+            name="valide"
+            value="1"
+            {% if ident.valide %}checked{% endif %}>
+
+        <label>Profil
+            <select name="id_role" id="role-select">
+                {% for role in roles %}
+                    <option value="{{ role.id_role }}"
+                        {% if ident.id_role is defined and ident.id_role == role.id_role %}
+                            selected
+                        {% endif %}>
+                        {{ role.role }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <div id="pilote-block" style="display: none;">
+            <label>Etudiants Pilotés</label>
+
+            <select id="etudiant-select">
+                <option value="">-- Choisir un étudiant --</option>
+                {% for c in etudiants %}
+                    <option value="{{ c.id_ident }}">
+                        {{ c.nom ~ ' ' ~ c.prenom }}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="button" id="add-etudiant">Ajouter</button>
+
+            <div id="etudiants-container" class="etudiants-container">
+                {% if etu_selected is not empty %}
+                    {% for e in etu_selected %}
+                        <div class="etudiant-item">
+                            {{ e.nom ~ ' ' ~ e.prenom }}
+                            <button type="button" class="remove">X</button>
+                            <input type="hidden" name="etudiants[]" value="{{ e.id_ident }}">
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="placeholder">Aucun étudiant sélectionné</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <button type="submit">Sauve</button>
+        <button type="button"
+                onclick="window.location.href='{{ CDN ~ PREFIX ~ '/ident/recherche' }}'">
+            Annule
+        </button>
+    </form>
+
+    <br/>
+
+    <form id="formIdentPasswd" data-validate="true" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="form_type" value="update_password">
+
+        <label>Password</label>
+        <input type="password" name="passwd" id="passwd" data-validate="required|alpha">
+
+        <button type="submit">Modifier le mot de passe</button>
+    </form>
+
+    {% if ident.id_role in POSTULE %}
+
+        {% if wishlist is not empty %}
+            <br/>
+            <hr/>
+
+            <div class="results">
+                <h2>Wishlist</h2>
+
+                {% for item in wishlist %}
+                    <div class="card">
+                        <div class="card-left">
+                            <h3>{{ item.nom }}</h3>
+                            <p>{{ item.titre }}</p>
+                            <br/>
+                            <p><u>Date de l'offre</u>: {{ item.date_offre }}</p>
+                            <p><u>Description</u>: {{ item.description }}</p>
+                        </div>
+
+                        <div class="card-right">
+                            <p>{{ item.base_remuneration }} €/mois</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if postule is not empty %}
+            <br/>
+            <hr/>
+
+            <div class="results">
+                <h2>Candidature</h2>
+
+                {% for item in postule %}
+                    <div class="card">
+                        <div class="card-left">
+                            <h3>{{ item.nom }}</h3>
+                            <p>{{ item.titre }}</p>
+                            <br/>
+                            <p><u>Date de l'offre</u>: {{ item.date_offre }}</p>
+                            <p><u>Description</u>: {{ item.description }}</p>
+                            <p><u>Base de rémunération</u>: {{ item.base_remuneration }} €/mois</p>
+                        </div>
+
+                        <div class="card-right">
+
+                            {# ✏️ Edit #}
+                            {{ item.buttons.edit|raw }}
+
+                            {# 🗑 Delete #}
+                            {{ item.buttons.delete|raw }}
+                            
+                        </div>
+
+                        <div class="card-right">
+                            <p><u>Postulé le</u>: {{ item.date_postule }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    {% endif %}
+{% endblock %}
