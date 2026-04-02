@@ -1,0 +1,24 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h1>Plan du site </h1>
+
+    <div class="results">
+        {% if pages is not empty %}
+            <div class="card">
+                <ul>
+                    {% for page in pages %}
+                    <li>
+                        <p class="role"><strong>{{ page.menu }} {{ page.label }}</strong></p>
+                        <p class="info"><a 
+                                href="{{ CDN ~ PREFIX }}/{{ page.url }}">
+                                {{ page.url }}
+                            </a>
+                        </p>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
