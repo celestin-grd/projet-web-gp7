@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /auth/
+Disallow: /admin/
+Allow: /
+
+Sitemap: https://web4all.local/sitemap.xml
