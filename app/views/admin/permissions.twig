@@ -1,0 +1,42 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+       <h2>Gestion des permissions </h2>
+       <form method="POST">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <table border="1" cellpadding="8">
+                     <thead>
+                            <tr>
+                                   <th>Permission</th>
+                                   {% for role in roles %}
+                                          <th>{{ role.role }}</th>
+                                   {% endfor %}
+                            </tr>
+                     </thead>
+                     <tbody>
+                     {% for perm in permissions %}
+                            <tr>
+                                   <td>{{ perm.permission }}</td>
+                            {% for role in roles %}
+                                   <td style="text-align:center">
+                                   <input type="hidden"
+                                          name="perm[{{ role.id_role }}][{{ perm.permission}}]"
+                                          value="0">
+                                   <input type="checkbox"
+                                          name="perm[{{ role.id_role }}][{{ perm.permission}}]"
+                                          value="1"
+                                          {% if matrix[role.id_role][perm.permission] is defined and matrix[role.id_role][perm.permission] %}
+                                          checked
+                                          {% endif %}
+                                          >
+                                   </td>
+                            {% endfor %}
+                            </tr>
+                     {% endfor %}
+                     </tbody>
+              </table>
+              <br>
+              <button type="submit">Enregistrer</button>
+              <button type="button" onclick="window.location.href='{{ CDN ~ PREFIX }}/home/index'">Annule</button>
+       </form>
+{% endblock %}
