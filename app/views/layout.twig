@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ APP_NAME }}</title>
+
+    <meta name="description" content="{{ description|default('Site Web pour trouver des entreprises et stages') }}">
+    <meta name="robots" content="{{ robots|default('index,follow') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="manifest" href="{{ CDN ~ PREFIX }}/manifest.json">
+    <meta name="theme-color" content="#2c3e50">
+
+    <link rel="stylesheet" href="{{ STATIQUE ~ PREFIX }}/css/style.css">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-status-bar-style" content="black">
+    <meta name="mobile-web-app-title" content="Web4All">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{{ STATIQUE ~ PREFIX }}/js/modules/menu.js"></script>
+    <script src="{{ STATIQUE ~ PREFIX }}/js/modules/modal.js"></script>
+    <script src="{{ STATIQUE ~ PREFIX }}/js/modules/form-validation.js"></script>
+    <script src="{{ STATIQUE ~ PREFIX }}/js/modules/stars.js"></script>
+    <script src="{{ STATIQUE ~ PREFIX }}/js/app.js"></script>
+</head>
+
+<body>
+
+{% include 'partials/header.twig' %}
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+{% include 'partials/footer.twig' %}
+
+</body>
+</html>
