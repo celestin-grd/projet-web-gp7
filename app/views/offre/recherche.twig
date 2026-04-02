@@ -1,0 +1,186 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h2>Recherche d'offres </h2>
+
+    <p>A la recherche d'une offre</p>
+
+    <script src="{{ CDN ~ PREFIX ~ '/js/modules/wishlist.js' }}"></script>
+
+    {% if errors is not empty %}
+        <div class="error-box">
+            {% for fieldErrors in errors %}
+                {% for error in fieldErrors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- FORMULAIRE RECHERCHE SIMPLE -->
+    <form id="formOffre" data-validate="true" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="page" value="{{ page ?? 1 }}">
+        <input type="hidden" name="valide" value="{{ filters.valide ? 1 : 0 }}">
+
+        <div class="search-box">
+            <input type="text"
+                name="titre"
+                data-validate="optional|alpha"
+                placeholder="Nom de l'offre"
+                value="{{ filters.titre ?? '' }}">
+            <button type="submit">Rechercher</button>
+        </div>
+    </form>
+
+    <div class="search-advanced">
+        <button type="button" id="btnAffiner">Affiner</button>
+    </div>
+
+    <!-- ZONE RESULTATS -->
+    <div class="results">
+
+        {% if results is not empty %}
+
+            <script>
+                window.csrf_token = "{{ csrf_token }}";
+            </script>
+
+            {% for offre in results %}
+                <div class="card">
+                    <div class="card-left">
+                        <h3>{{ offre.titre }}</h3>
+                        <p>{{ offre.description }}</p>
+                    </div>
+
+                    <div class="card-left">
+                        {% if offre.nb_candidatures > 0 %}
+                            <p><u>Nbre de candidats</u>: (<a class="btn-icon"
+                                        href="{{ CDN ~ PREFIX }}/postule/show/{{ offre.id_offre }}">
+                                        {{ offre.nb_candidatures }}
+                                    </a>)
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-right">
+
+                        {% if offre.in_postule == 0 %}
+
+                            {# ✉ Postule #}
+                            {{ offre.buttons.postule|raw }}
+
+                            {# ★ Wishlist #}
+                            {{ offre.buttons.wishlist|raw }}
+                            
+                        {% endif %}
+
+                        {# ✏️ Edit #}
+                        {{ offre.buttons.edit|raw }}
+
+                        {# 🗑 Delete #}
+                        {{ offre.buttons.delete|raw }}
+
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <div class="card">
+                <h3>Aucun résultat</h3>
+            </div>
+        {% endif %}
+
+        {% if totalPages is not empty and totalPages > 1 %}
+            <div class="pagination">
+                {% for p in pagination %}
+                    {% if p == '...' %}
+                        <span class="pagination-dots">...</span>
+                    {% else %}
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                            <input type="hidden" name="page" value="{{ p }}">
+                            <input type="hidden" name="titre" value="{{ filters.titre ?? '' }}">
+                            <input type="hidden" name="description" value="{{ filters.description ?? '' }}">
+                            <input type="hidden" name="date_offre" value="{{ filters.date_offre ?? '' }}">
+                            <input type="hidden" name="id_entreprise" value="{{ filters.id_entreprise ?? '' }}">
+                            <input type="hidden" name="base_remuneration" value="{{ filters.base_remuneration ?? '' }}">
+                            <input type="hidden" name="valide" value="{{ filters.valide ? 1 : 0 }}">
+
+                            <button type="submit"
+                                    class="page-btn {% if p == page %}active{% endif %}">
+                                {{ p }}
+                            </button>
+                        </form>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+    </div>
+
+    <button class="btn-add"
+            onclick="window.location.href='{{ CDN ~ PREFIX ~ '/offre/create' }}'">
+        Ajouter
+    </button>
+
+    <!-- MODAL -->
+    <div class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>Recherche avancée</h3>
+
+            <form id="formOffre" data-validate="true" method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                <input type="hidden" name="page" value="{{ page ?? 1 }}">
+
+                <label for="description">Description</label>
+                <input type="text"
+                    name="description"
+                    id="description"
+                    data-validate="optional|txt"
+                    value="{{ filters.description ?? '' }}">
+
+                <label for="base_remuneration">Base Rémunération</label>
+                <input type="number"
+                    name="base_remuneration"
+                    id="base_remuneration"
+                    data-validate="optional|integer"
+                    value="{{ filters.base_remuneration ?? '' }}">
+
+                <label for="date_offre">Date Offre</label>
+                <input type="date"
+                    name="date_offre"
+                    id="date_offre"
+                    data-validate="optional|date"
+                    value="{{ filters.date_offre ?? '' }}">
+
+                <label>Entreprise
+                    <select name="id_entreprise" data-validate="optional|integer">
+                        <option value="-1">-----</option>
+
+                        {% for entreprise in entreprises %}
+                            <option value="{{ entreprise.id_entreprise }}"
+                                {% if filters.id_entreprise is defined and filters.id_entreprise == entreprise.id_entreprise %}
+                                    selected
+                                {% endif %}>
+                                {{ entreprise.nom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+
+                <label>Active
+                    <input type="checkbox"
+                        name="valide"
+                        value="1"
+                        {% if filters.valide is not defined or filters.valide %}
+                            checked
+                        {% endif %}>
+                </label>
+
+                <button type="submit">Rechercher</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

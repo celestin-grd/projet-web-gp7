@@ -1,0 +1,110 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h2>Modification d'offre </h2>
+
+    <script src="{{ CDN ~ PREFIX ~ '/js/modules/offre.js' }}"></script>
+
+    {% if errors is not empty %}
+        <div class="error-box">
+            {% for fieldErrors in errors %}
+                {% for error in fieldErrors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form id="formOffre" data-validate="true" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+        <label for="titre">Titre</label>
+        <input type="text"
+            id="titre"
+            name="titre"
+            value="{{ offre.titre ?? '' }}"
+            data-validate="required|alpha">
+
+        <label for="description">Description</label>
+        <textarea name="description"
+                id="description"
+                data-validate="required|txt">{{ offre.description ?? '' }}</textarea>
+
+        <label for="base_remuneration">Base de rémunération</label>
+        <input type="number"
+            name="base_remuneration"
+            id="base_remuneration"
+            value="{{ offre.base_remuneration|round(0, 'floor') }}"
+            data-validate="required|integer">
+
+        <label for="date_offre">Date de l'offre</label>
+        <input type="date"
+            id="date_offre"
+            name="date_offre"
+            value="{{ offre.date_offre ?? '' }}"
+            data-validate="required|date">
+
+        <label>Active
+            <input type="checkbox"
+                name="valide"
+                value="1"
+                {% if offre.valide is not defined or offre.valide %}
+                    checked
+                {% endif %}>
+        </label>
+
+        <label>Entreprise</label>
+        <select name="id_entreprise">
+            {% for entreprise in entreprises %}
+                <option value="{{ entreprise.id_entreprise }}"
+                    {% if offre.id_entreprise is defined and offre.id_entreprise == entreprise.id_entreprise %}
+                        selected
+                    {% endif %}>
+                    {{ entreprise.nom }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <hr/>
+
+        <label>Compétences requises</label>
+
+        <select id="competence-select">
+            <option value="">-- Choisir une compétence --</option>
+            {% for c in competences %}
+                <option value="{{ c.id_competence }}">
+                    {{ c.competence }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button type="button" id="add-competence">Ajouter</button>
+
+        <div id="competences-container" class="competences-container">
+            {% if selectedCompetences is not empty %}
+
+                {% for c in selectedCompetences %}
+                    <div class="competence-item">
+                        {{ c.competence }}
+                        <button type="button" class="remove">X</button>
+                        <input type="hidden" name="competences[]" value="{{ c.id_competence }}">
+                    </div>
+                {% endfor %}
+
+            {% else %}
+
+                <p class="placeholder">Aucune compétence sélectionnée</p>
+
+            {% endif %}
+        </div>
+
+        <hr/>
+
+        <button type="submit">Sauve</button>
+
+        <button type="button"
+                onclick="window.location.href='{{ CDN ~ PREFIX ~ '/offre/recherche' }}'">
+            Annule
+        </button>
+    </form>
+{% endblock %}

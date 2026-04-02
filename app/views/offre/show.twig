@@ -1,0 +1,56 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h2>Offres de l'entreprise </h2>
+
+    <div class="results">
+        {% if results is not empty %}
+            <h3>{{ results[0].nom }}</h3>
+            <br/>
+            {% for offre in results %}
+                
+                <div class="card">
+                    <div class="card-left">
+                        <h3>
+                            {{ offre.titre }}
+                        </h3>
+                        <p><u>Description</u>:  {{offre.description }}</p>
+                        <p><u>Date</u>: {{offre.date_offre }}</p>
+                    </div>
+                    <div class="card-right">
+                        <p><u>Base de rémunération</u>:<br/>{{offre.base_remuneration }} €/mois</p>
+                        {% if offre.nb_candidatures > 0 %}
+                            <p><u>Nb Candidatures</u>: (<a class="btn-icon"
+                                    href="{{ CDN ~ PREFIX }}/postule/show/{{ offre.id_offre }}">
+                                    {{ offre.nb_candidatures }}
+                                </a>)
+                            </p>
+                        {% else %}
+                            <br/>
+                            <p><i>aucune candidature</i></p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% if totalPages > 1 %}
+            <div class="pagination">
+            {% for p in pagination %}
+                {% if p == '...' %}
+                    <span class="pagination-dots">...</span>
+                {% else %}
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+                        <input type="hidden" name="page" value="{{ p }}">
+                        <button type="submit"
+                                class="page-btn {{ p == page ? 'active' : '' }}">
+                            {{ p }}
+                        </button>
+                    </form>
+                {% endif %}
+            {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
