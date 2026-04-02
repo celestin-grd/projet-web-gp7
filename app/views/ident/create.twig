@@ -1,0 +1,59 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h2>Création d'identifiant </h2>
+
+    {# 🔴 erreurs #}
+    {% if errors is not empty %}
+        <div class="error-box">
+            {% for fieldErrors in errors %}
+                {% for error in fieldErrors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form id="formIdent" data-validate="true" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label for="nom">Nom</label>
+        <input type="text" id="nom" name="nom" value="{{ filters.nom }}" data-validate="required|alpha">
+
+        <label for="prenom">Prénom</label>
+        <input type="text" name="prenom" id="prenom" value="{{ filters.prenom }}" data-validate="required|alpha">
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" value="{{ filters.email }}" data-validate="required|email">
+
+        <label> Active
+            <input type="checkbox"
+                name="valide"
+                value="1"
+                {% if filters.valide is not defined or filters.valide %}checked{% endif %}
+                >
+        </label>
+
+        <label>Profil
+            <select name="id_role">
+                <option value="-1">---Choisir---</option>
+                {% for role in roles %}
+                    <option value="{{ role.id_role }}"
+                        {% if filters.id_role is defined and filters.id_role == role.id_role %}
+                            selected
+                        {% endif %}
+                        >
+                        {{ role.role }}
+                    </option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label for="passwd">Password</label>
+        <input type="password" name="passwd" id="passwd" data-validate="required|alpha">
+        
+        <button type="submit">Sauve</button>
+        <button type="button" onclick="window.location.href='{{ CDN ~ PREFIX }}/ident/recherche'">Annule</button>
+
+    </form>
+
+{% endblock %}
