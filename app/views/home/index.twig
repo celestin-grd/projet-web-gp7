@@ -1,0 +1,47 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+
+    <h1>Bienvenue sur CESI1STAGE </h1>
+
+    <section class="home-intro">
+        <p>
+            Bienvenue sur CESI1STAGE, votre plateforme dédiée à la gestion et à la recherche d’entreprises 
+            pour vos stages et alternances.
+        </p>
+    </section>
+
+    <section class="home-description">
+        <h2>À quoi sert CESI1STAGE ?</h2>
+
+        <p>
+            CESI1STAGE vous permet de centraliser et organiser vos recherches d’entreprises, 
+            de consulter des informations utiles et de suivre vos opportunités professionnelles.
+        </p>
+
+        <p>
+            Grâce à une interface simple et efficace, vous pouvez :
+        </p>
+
+        <ul>
+            <li>Rechercher des entreprises</li>
+            <li>Gérer vos propres fiches entreprises</li>
+            <li>Mettre à jour les informations</li>
+            <li>Accéder aux données importantes</li>
+        </ul>
+    </section>
+
+    <section class="home-action">
+        <h2>Commencer</h2>
+
+        <p>
+            Utilisez le menu pour naviguer dans l’application ou commencez dès maintenant 
+            votre recherche d’entreprise.
+        </p>
+
+        <a href="{{ CDN ~ PREFIX }}/entreprise/recherche" class="btn-primary">
+            Rechercher une entreprise
+        </a>
+    </section>
+
+{% endblock %}
