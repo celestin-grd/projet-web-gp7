@@ -1,0 +1,45 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <h2>Modification d'entreprise </h2>
+
+    {# 🔴 erreurs #}
+    {% if errors is not empty %}
+        <div class="error-box">
+            {% for fieldErrors in errors %}
+                {% for error in fieldErrors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form id="formEntreprise" data-validate="true" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Nom</label>
+        <input type="text" name="nom" value="{{ entreprise.nom }}" data-validate="required|alpha">
+
+        <label>Description</label>
+        <textarea name="description" data-validate="required|txt">{{ entreprise.description }}</textarea>
+
+        <label>Téléphone</label>
+        <input type="text" name="telephone" value="{{ entreprise.telephone }}" data-validate="required|phone">
+
+        <label>Email</label>
+        <input type="email" name="email" value="{{ entreprise.email }}" data-validate="required|email">
+
+        <label for="valide">Active</label>
+        <input type="checkbox"
+        name="valide"
+        id="valide"
+        value="1"
+        {% if entreprise.valide is not defined or entreprise.valide %}checked{% endif %}
+        >
+
+        <p>Dernière mise a jour le {{ entreprise.valide_lastupdate }}</p>
+
+        <button type="submit">Sauve</button>
+        <button type="button" onclick="window.location.href='{{ CDN ~ PREFIX }}/entreprise/recherche'">Annule</button>
+
+    </form>
+{% endblock %}
